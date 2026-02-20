@@ -1,13 +1,16 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Menu, X, MapPin, Phone, Mail, Clock, Search, ChevronDown } from 'lucide-react'
+import { MapPin, Phone, Mail, Clock, Search } from 'lucide-react'
+import dynamic from 'next/dynamic'
+
+const StaggeredMenu = dynamic(() => import('./StaggeredMenu').then(mod => ({ default: mod.StaggeredMenu })), { ssr: false })
 
 export default function Header() {
-  const [isOpen, setIsOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 40)
@@ -15,12 +18,28 @@ export default function Header() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  const handleMenuOpen = useCallback(() => setMenuOpen(true), [])
+  const handleMenuClose = useCallback(() => setMenuOpen(false), [])
+
   const navLinks = [
     { href: '/', label: 'Home' },
     { href: '#products', label: 'Products' },
     { href: '#about', label: 'About Us' },
     { href: '#services', label: 'Services' },
     { href: '#contact', label: 'Contact' },
+  ]
+
+  const staggeredMenuItems = navLinks.map(link => ({
+    label: link.label,
+    ariaLabel: `Go to ${link.label}`,
+    link: link.href,
+  }))
+
+  const socialItems = [
+    { label: 'Facebook', link: '#' },
+    { label: 'Twitter', link: '#' },
+    { label: 'Instagram', link: '#' },
+    { label: 'LinkedIn', link: '#' },
   ]
 
   return (
@@ -58,7 +77,7 @@ export default function Header() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-3 group">
+            <Link href="/" className="flex items-center gap-3 group relative z-[60]">
               <div className="relative">
                 <Image
                   src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logo-SPzh0eq0jCHnxTOHdZqlHZy8leXJSQ.png"
@@ -69,7 +88,7 @@ export default function Header() {
                 />
               </div>
               <div>
-                <p className="text-base font-bold text-primary-foreground tracking-wide">THE GUJARAT</p>
+                <p className={`text-base font-bold tracking-wide transition-colors duration-300 ${menuOpen ? 'text-[#1a3a0a]' : 'text-primary-foreground'}`}>THE GUJARAT</p>
                 <p className="text-xs text-accent font-semibold tracking-widest">FERTILIZERS</p>
               </div>
             </Link>
@@ -88,53 +107,42 @@ export default function Header() {
               ))}
             </nav>
 
-            {/* CTA Button + Search */}
-            <div className="hidden lg:flex items-center gap-4">
-              <button className="text-primary-foreground/80 hover:text-accent transition-colors" aria-label="Search">
+            {/* CTA Button + Staggered Menu Trigger */}
+            <div className="flex items-center gap-4">
+              <button className="hidden lg:block text-primary-foreground/80 hover:text-accent transition-colors" aria-label="Search">
                 <Search size={20} />
               </button>
               <Link
                 href="#contact"
-                className="bg-accent text-accent-foreground px-6 py-2.5 rounded-full text-sm font-bold hover:bg-accent/90 transition-all duration-300 hover:shadow-lg hover:shadow-accent/20"
+                className="hidden lg:block bg-accent text-accent-foreground px-6 py-2.5 rounded-full text-sm font-bold hover:bg-accent/90 transition-all duration-300 hover:shadow-lg hover:shadow-accent/20"
               >
                 Get In Touch
               </Link>
             </div>
-
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="lg:hidden text-primary-foreground p-2"
-              aria-label="Toggle menu"
-            >
-              {isOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
           </div>
         </div>
-
-        {/* Mobile Navigation */}
-        <div className={`lg:hidden overflow-hidden transition-all duration-500 ${isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
-          <nav className="px-4 pb-6 flex flex-col gap-1 bg-[#1a3a0a]">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="text-primary-foreground/80 hover:text-accent hover:bg-primary-foreground/5 px-4 py-3 rounded-lg transition-all font-medium"
-                onClick={() => setIsOpen(false)}
-              >
-                {link.label}
-              </Link>
-            ))}
-            <Link
-              href="#contact"
-              className="bg-accent text-accent-foreground px-6 py-3 rounded-full text-sm font-bold text-center mt-3 hover:bg-accent/90 transition"
-              onClick={() => setIsOpen(false)}
-            >
-              Get In Touch
-            </Link>
-          </nav>
-        </div>
       </header>
+
+      {/* Staggered Menu Overlay */}
+      <div className="lg:hidden">
+        <StaggeredMenu
+          isFixed={true}
+          position="right"
+          colors={['#d4af37', '#2d5016']}
+          accentColor="#d4af37"
+          menuButtonColor="#ffffff"
+          openMenuButtonColor="#1a3a0a"
+          changeMenuColorOnOpen={true}
+          closeOnClickAway={true}
+          displaySocials={true}
+          displayItemNumbering={true}
+          items={staggeredMenuItems}
+          socialItems={socialItems}
+          logoUrl="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logo-SPzh0eq0jCHnxTOHdZqlHZy8leXJSQ.png"
+          onMenuOpen={handleMenuOpen}
+          onMenuClose={handleMenuClose}
+        />
+      </div>
     </>
   )
 }
