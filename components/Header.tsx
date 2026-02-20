@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Menu, X } from 'lucide-react'
 
 export default function Header() {
@@ -14,13 +15,17 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
-          <Link href="/" className="flex items-center">
-            <div className="text-2xl font-bold text-primary">
-              TGF
-            </div>
-            <div className="ml-2">
-              <p className="text-xs font-semibold text-primary">THE GUJARAT</p>
-              <p className="text-xs font-semibold text-primary">FERTILIZERS</p>
+          <Link href="/" className="flex items-center gap-3">
+            <Image
+              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logo-SPzh0eq0jCHnxTOHdZqlHZy8leXJSQ.png"
+              alt="The Gujarat Fertilizers Logo"
+              width={60}
+              height={60}
+              className="object-contain"
+            />
+            <div className="hidden sm:block">
+              <p className="text-sm font-bold text-primary">THE GUJARAT</p>
+              <p className="text-sm font-bold text-primary">FERTILIZERS</p>
             </div>
           </Link>
 

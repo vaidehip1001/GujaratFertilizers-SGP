@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { Facebook, Twitter, Instagram, Linkedin } from 'lucide-react'
 
 export default function Footer() {
@@ -11,7 +12,13 @@ export default function Footer() {
         <div className="grid md:grid-cols-4 gap-8 mb-12">
           {/* Company Info */}
           <div>
-            <h3 className="text-2xl font-bold mb-4">TGF</h3>
+            <Image
+              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logo-SPzh0eq0jCHnxTOHdZqlHZy8leXJSQ.png"
+              alt="The Gujarat Fertilizers Logo"
+              width={80}
+              height={80}
+              className="object-contain mb-4"
+            />
             <p className="text-white/80 leading-relaxed mb-6">
               The Gujarat Fertilizers Limited - Delivering premium agricultural solutions for over 50 years.
             </p>
