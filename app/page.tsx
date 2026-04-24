@@ -1,3 +1,4 @@
+import { PrismaClient } from '@prisma/client'
 import Header from '@/components/Header'
 import Hero from '@/components/Hero'
 import Features from '@/components/Features'
@@ -10,7 +11,14 @@ import Contact from '@/components/Contact'
 import Footer from '@/components/Footer'
 import ScrollToTop from '@/components/ScrollToTop'
 
-export default function Home() {
+export default async function Home() {
+  const prisma = new PrismaClient()
+  const initialProducts = await prisma.product.findMany({
+    take: 8,
+    orderBy: { name: 'asc' }
+  })
+  await prisma.$disconnect()
+
   return (
     <main>
       <Header />
@@ -18,7 +26,7 @@ export default function Home() {
       <Features />
       <About />
       <StatsCounter />
-      <Products />
+      <Products initialProducts={initialProducts} />
       <Services />
       <Testimonials />
       <Contact />

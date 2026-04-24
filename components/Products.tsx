@@ -3,112 +3,12 @@
 import { useState, useRef, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useScrollAnimation } from '@/hooks/use-scroll-animation'
-import { ArrowRight, ShoppingCart, Eye, Star } from 'lucide-react'
-
-type Category = 'all' | 'best-sellers' | 'organic' | 'new-arrivals' | 'specialty'
-
-interface Product {
-  name: string
-  price: string
-  originalPrice?: string
-  image: string
-  category: Category[]
-  tag?: string
-  rating: number
-  reviews: number
-  badge?: 'hot' | 'new' | 'sale'
-}
-
-const categories: { id: Category; label: string }[] = [
-  { id: 'all', label: 'All Products' },
-  { id: 'best-sellers', label: 'Best Sellers' },
-  { id: 'organic', label: 'Organic Range' },
-  { id: 'new-arrivals', label: 'New Arrivals' },
-  { id: 'specialty', label: 'Specialty' },
-]
-
-const products: Product[] = [
-  {
-    name: 'NPK Fertilizer',
-    price: '1,450',
-    originalPrice: '1,800',
-    image: '/images/product-npk.jpg',
-    category: ['all', 'best-sellers'],
-    tag: 'Complete nutrition for all crops',
-    rating: 4.8,
-    reviews: 342,
-    badge: 'hot',
-  },
-  {
-    name: 'Urea 46',
-    price: '980',
-    image: '/images/product-urea.jpg',
-    category: ['all', 'best-sellers'],
-    tag: 'High-nitrogen for rapid growth',
-    rating: 4.7,
-    reviews: 289,
-  },
-  {
-    name: 'Phosphate Mix',
-    price: '1,250',
-    image: '/images/product-phosphate.jpg',
-    category: ['all', 'organic'],
-    tag: 'Strong root development',
-    rating: 4.6,
-    reviews: 198,
-  },
-  {
-    name: 'Potassium Complex',
-    price: '1,680',
-    originalPrice: '2,100',
-    image: '/images/product-potassium.jpg',
-    category: ['all', 'new-arrivals'],
-    tag: 'Disease resistance booster',
-    rating: 4.9,
-    reviews: 156,
-    badge: 'new',
-  },
-  {
-    name: 'Micronutrient Blend',
-    price: '2,200',
-    image: '/images/product-micronutrient.jpg',
-    category: ['all', 'specialty'],
-    tag: 'Essential trace elements',
-    rating: 4.5,
-    reviews: 124,
-  },
-  {
-    name: 'Organic Compost Plus',
-    price: '850',
-    image: '/images/product-organic.jpg',
-    category: ['all', 'organic', 'new-arrivals'],
-    tag: '100% natural ingredients',
-    rating: 4.8,
-    reviews: 267,
-    badge: 'new',
-  },
-  {
-    name: 'Sulphur Granules',
-    price: '1,100',
-    originalPrice: '1,350',
-    image: '/images/product-sulphur.jpg',
-    category: ['all', 'specialty'],
-    tag: 'Soil pH correction',
-    rating: 4.4,
-    reviews: 98,
-    badge: 'sale',
-  },
-  {
-    name: 'Zinc Sulphate',
-    price: '1,320',
-    image: '/images/product-zinc.jpg',
-    category: ['all', 'specialty', 'best-sellers'],
-    tag: 'Zinc deficiency treatment',
-    rating: 4.6,
-    reviews: 176,
-  },
-]
+import { ArrowRight, ShoppingCart, Eye, Star, CheckCircle2 } from 'lucide-react'
+import { useAuth } from '@/lib/auth-context'
+import { useCart } from '@/lib/cart-context'
+import { filterCategories, type Product, type Category } from '@/lib/products-data'
 
 const featuredCategories = [
   {
@@ -116,12 +16,14 @@ const featuredCategories = [
     subtitle: 'Premium Range',
     image: '/images/cat-soil-health.jpg',
     cta: 'Shop Now',
+    href: '/products/soil-health',
   },
   {
     title: 'Crop Growth',
     subtitle: 'Top Products',
     image: '/images/cat-crop-growth.jpg',
     cta: 'Shop Now',
+    href: '/products/crop-growth',
   },
 ]
 
@@ -145,7 +47,7 @@ function StarRating({ rating }: { rating: number }) {
   )
 }
 
-function ProductCard({ product, index }: { product: Product; index: number }) {
+function ProductCard({ product, index, onBuy }: { product: Product; index: number; onBuy: (product: Product) => void }) {
   return (
     <div
       className={`animate-fade-up delay-${((index % 4) + 1) * 100} group relative`}
@@ -178,6 +80,7 @@ function ProductCard({ product, index }: { product: Product; index: number }) {
             <Eye size={16} />
           </button>
           <button
+            onClick={() => onBuy(product)}
             className="w-10 h-10 rounded-full bg-[#ffffff] shadow-lg flex items-center justify-center hover:bg-[#d4af37] hover:text-[#1a1a1a] text-[#1a1a1a] transition-colors duration-200"
             aria-label={`Add ${product.name} to cart`}
           >
@@ -230,6 +133,7 @@ function ProductCard({ product, index }: { product: Product; index: number }) {
               )}
             </div>
             <button
+              onClick={() => onBuy(product)}
               className="w-9 h-9 rounded-full bg-[#2d5016] text-[#ffffff] flex items-center justify-center hover:bg-[#d4af37] hover:text-[#1a1a1a] transition-all duration-300 hover:scale-110"
               aria-label={`Add ${product.name} to cart`}
             >
@@ -242,20 +146,47 @@ function ProductCard({ product, index }: { product: Product; index: number }) {
   )
 }
 
-export default function Products() {
+export default function Products({ initialProducts = [] }: { initialProducts?: Product[] }) {
   const ref = useScrollAnimation()
+  const router = useRouter()
+  const { isLoggedIn } = useAuth()
+  const { addToCart } = useCart()
   const [activeCategory, setActiveCategory] = useState<Category>('all')
-  const [filteredProducts, setFilteredProducts] = useState(products)
+  const [filteredProducts, setFilteredProducts] = useState(initialProducts)
   const [isAnimating, setIsAnimating] = useState(false)
+  const [toast, setToast] = useState('')
   const gridRef = useRef<HTMLDivElement>(null)
+
+  const handleBuy = (product: Product | string) => {
+    if (!isLoggedIn) {
+      router.push('/login?redirect=products')
+      return
+    }
+
+    if (typeof product === 'string') {
+        const item = initialProducts.find(p => p.name === product)
+        if (item) {
+           addToCart({ name: item.name, price: item.price, image: item.image })
+           setToast(`"${item.name}" added to cart!`)
+        } else {
+            router.push('/cart')
+        }
+    } else {
+        // Product object
+        addToCart({ name: product.name, price: product.price, image: product.image })
+        setToast(`"${product.name}" added to cart!`)
+    }
+    
+    setTimeout(() => setToast(''), 3000)
+  }
 
   useEffect(() => {
     setIsAnimating(true)
     const timer = setTimeout(() => {
       setFilteredProducts(
         activeCategory === 'all'
-          ? products
-          : products.filter((p) => p.category.includes(activeCategory))
+          ? initialProducts
+          : initialProducts.filter((p) => p.category.includes(activeCategory))
       )
       setIsAnimating(false)
     }, 300)
@@ -265,6 +196,14 @@ export default function Products() {
   return (
     <section id="products" ref={ref} className="py-24 md:py-32 bg-[#ffffff] overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        {/* Toast notification */}
+        {toast && (
+          <div className="fixed top-24 right-6 z-[100] flex items-center gap-3 bg-[#0f2a04] text-white px-5 py-4 rounded-xl shadow-2xl animate-fade-down max-w-sm">
+            <CheckCircle2 size={18} className="text-[#d4af37] flex-shrink-0" />
+            <p className="text-sm">{toast}</p>
+          </div>
+        )}
 
         {/* Featured Categories */}
         <div className="grid md:grid-cols-2 gap-6 mb-24">
@@ -288,7 +227,7 @@ export default function Products() {
                   {cat.title}
                 </h3>
                 <Link
-                  href="#contact"
+                  href={cat.href}
                   className="inline-flex items-center gap-2 bg-[#d4af37] text-[#1a1a1a] px-6 py-3 rounded-full text-sm font-bold w-fit hover:bg-[#ffffff] transition-all duration-300 group/btn"
                 >
                   {cat.cta}
@@ -319,7 +258,7 @@ export default function Products() {
 
         {/* Category Filter Tabs */}
         <div className="flex flex-wrap items-center justify-center gap-3 mb-14 animate-fade-up">
-          {categories.map((cat) => (
+          {filterCategories.map((cat) => (
             <button
               key={cat.id}
               onClick={() => setActiveCategory(cat.id)}
@@ -342,7 +281,7 @@ export default function Products() {
           }`}
         >
           {filteredProducts.map((product, idx) => (
-            <ProductCard key={product.name} product={product} index={idx} />
+            <ProductCard key={product.name} product={product} index={idx} onBuy={handleBuy} />
           ))}
         </div>
 
@@ -356,7 +295,7 @@ export default function Products() {
         {/* View All CTA */}
         <div className="text-center mt-16 animate-fade-up">
           <Link
-            href="#contact"
+            href="/products"
             className="inline-flex items-center gap-3 border-2 border-[#2d5016] text-[#2d5016] px-10 py-4 rounded-full font-bold text-sm hover:bg-[#2d5016] hover:text-[#ffffff] transition-all duration-300 group"
           >
             View All Products

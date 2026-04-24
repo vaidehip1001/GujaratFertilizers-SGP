@@ -31,33 +31,6 @@ export default function Footer() {
 
   return (
     <footer className="bg-[#0f2a04] text-primary-foreground">
-      {/* Newsletter Strip */}
-      <div className="bg-accent">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div>
-              <h3 className="text-xl md:text-2xl font-serif font-bold text-accent-foreground">
-                Stay Updated with Agricultural Insights
-              </h3>
-              <p className="text-accent-foreground/80 text-sm mt-1">
-                Subscribe to our newsletter for farming tips, product updates, and seasonal guides.
-              </p>
-            </div>
-            <div className="flex w-full md:w-auto">
-              <input
-                type="email"
-                placeholder="Your email address"
-                className="flex-1 md:w-72 px-5 py-3 rounded-l-full bg-accent-foreground/10 border border-accent-foreground/20 text-accent-foreground placeholder:text-accent-foreground/50 focus:outline-none focus:border-accent-foreground/40 text-sm"
-              />
-              <button className="bg-[#0f2a04] text-primary-foreground px-6 py-3 rounded-r-full font-bold text-sm hover:bg-primary transition-colors flex items-center gap-2">
-                Subscribe
-                <ArrowRight size={14} />
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Main Footer Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-10">
@@ -144,21 +117,23 @@ export default function Footer() {
             </h4>
             <div className="space-y-4 text-sm text-primary-foreground/60">
               <p>
-                <span className="text-primary-foreground font-semibold block mb-1">Address</span>
-                Navodaya Complex, Vadodara<br />
-                Gujarat, India - 390001
+                <span className="text-primary-foreground font-semibold block mb-1">Factory Address</span>
+                At: Jamnavad, Dhoraji - 360410
+              </p>
+              <p>
+                <span className="text-primary-foreground font-semibold block mb-1">Corporate Office</span>
+                &ldquo;Amofos House&rdquo; Station Road, Dhoraji,<br />
+                Dist. Rajkot - 360410
               </p>
               <p>
                 <span className="text-primary-foreground font-semibold block mb-1">Phone</span>
-                +91 9876 543 210
+                (+91) 87589 18848<br />
+                (+91) 94262 42547<br />
+                (+91) 94277 22370
               </p>
               <p>
                 <span className="text-primary-foreground font-semibold block mb-1">Email</span>
-                info@gujaratfertilizers.com
-              </p>
-              <p>
-                <span className="text-primary-foreground font-semibold block mb-1">Hours</span>
-                Mon - Fri: 9:00 AM - 6:00 PM
+                tgfjamnavad@yahoo.in
               </p>
             </div>
           </div>

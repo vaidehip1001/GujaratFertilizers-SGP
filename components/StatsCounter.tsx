@@ -4,10 +4,9 @@ import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 
 const stats = [
-  { value: 1360, suffix: '+', label: 'Completed Projects' },
-  { value: 10, suffix: 'M+', label: 'Farmers Served' },
-  { value: 4657, suffix: '+', label: 'Tons of Fertilizer' },
-  { value: 25, suffix: '+', label: 'Premium Products' },
+  { value: 100, suffix: '+', label: 'Total Products' },
+  { value: 150, suffix: '+', label: 'Total Team Members' },
+  { value: 105, suffix: 'K+', label: 'Happy Farmers' },
 ]
 
 function AnimatedNumber({ target, suffix, started }: { target: number; suffix: string; started: boolean }) {
@@ -74,7 +73,7 @@ export default function StatsCounter() {
 
       {/* Content */}
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 lg:gap-4">
           {stats.map((stat, idx) => (
             <div key={idx} className="text-center group">
               <div className="text-5xl md:text-6xl font-serif font-bold text-accent mb-3 transition-transform duration-300 group-hover:scale-105">
