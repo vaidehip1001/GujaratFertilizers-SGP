@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic'
 import { PrismaClient } from '@prisma/client'
 import Link from 'next/link'
 import { Users, FileText, Package, ExternalLink, Calendar, MapPin, Phone } from 'lucide-react'
