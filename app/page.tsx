@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic'
 import { PrismaClient } from '@prisma/client'
 import Header from '@/components/Header'
 import Hero from '@/components/Hero'

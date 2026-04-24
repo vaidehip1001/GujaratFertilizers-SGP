@@ -1,4 +1,5 @@
 import ProductsPageLayout from '@/components/ProductsPageLayout'
+export const dynamic = 'force-dynamic'
 import { PrismaClient } from '@prisma/client'
 
 export const metadata = {
